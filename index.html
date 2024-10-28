@@ -170,146 +170,8 @@
     </div>
 
     <script>
-        // База даних цитат за категоріями з ключовими словами
-        const quotesDatabase = {
-            career: {
-                keywords: ['робота', 'кар\'єра', 'професія', 'бізнес', 'компанія', 'колеги', 'начальник', 'підвищення', 'зарплата', 'звільнення', 'співбесіда'],
-                quotes: [
-                    {
-                        quote: "Виберіть роботу, яку ви любите, і вам не доведеться працювати жодного дня у своєму житті",
-                        author: "Конфуцій",
-                        keywords: ['робота', 'професія', 'кар\'єра']
-                    },
-                    {
-                        quote: "Секрет успіху в бізнесі – знати те, що ніхто інший не знає",
-                        author: "Арістотель Онассіс",
-                        keywords: ['бізнес', 'успіх', 'компанія']
-                    },
-                    {
-                        quote: "Найкращі керівники – ті, хто показує шлях, а не наказує куди йти",
-                        author: "Гарольд Генін",
-                        keywords: ['начальник', 'керівництво', 'колеги']
-                    }
-                ]
-            },
-            relationships: {
-                keywords: ['кохання', 'стосунки', 'сім\'я', 'друзі', 'дружба', 'конфлікт', 'розлучення', 'шлюб', 'діти', 'батьки'],
-                quotes: [
-                    {
-                        quote: "Любов не в тому, щоб дивитися один на одного, а в тому, щоб разом дивитися в одному напрямку",
-                        author: "Антуан де Сент-Екзюпері",
-                        keywords: ['кохання', 'стосунки', 'шлюб']
-                    },
-                    {
-                        quote: "Сім'я – це не важливе, це все",
-                        author: "Майкл Дж. Фокс",
-                        keywords: ['сім\'я', 'діти', 'батьки']
-                    },
-                    {
-                        quote: "Справжня дружба – це не те, як часто ви бачитесь, а те, що ви відчуваєте, коли нарешті зустрічаєтесь",
-                        author: "Джонатан Сафран Фоєр",
-                        keywords: ['дружба', 'друзі']
-                    }
-                ]
-            },
-            personal_growth: {
-                keywords: ['розвиток', 'навчання', 'освіта', 'самовдосконалення', 'мотивація', 'цілі', 'мрії', 'страх', 'впевненість', 'зміни'],
-                quotes: [
-                    {
-                        quote: "Єдиний спосіб робити велику роботу – любити те, що ви робите",
-                        author: "Стів Джобс",
-                        keywords: ['розвиток', 'мотивація', 'цілі']
-                    },
-                    {
-                        quote: "Освіта – це не підготовка до життя; освіта – це і є життя",
-                        author: "Джон Дьюї",
-                        keywords: ['освіта', 'навчання', 'розвиток']
-                    },
-                    {
-                        quote: "Найбільший ризик – це не ризикувати",
-                        author: "Марк Цукерберг",
-                        keywords: ['страх', 'зміни', 'впевненість']
-                    }
-                ]
-            },
-            health: {
-                keywords: ['здоров\'я', 'спорт', 'стрес', 'відпочинок', 'сон', 'харчування', 'медитація', 'тренування', 'енергія', 'втома'],
-                quotes: [
-                    {
-                        quote: "Здоров'я – це не все, але все без здоров'я – ніщо",
-                        author: "Сократ",
-                        keywords: ['здоров\'я', 'життя']
-                    },
-                    {
-                        quote: "Ваше тіло може витримати майже все. Це ваш розум потрібно переконати",
-                        author: "Роджер Банністер",
-                        keywords: ['спорт', 'тренування', 'мотивація']
-                    },
-                    {
-                        quote: "Стрес – це не те, що з вами відбувається, а те, як ви на це реагуєте",
-                        author: "Ганс Сельє",
-                        keywords: ['стрес', 'відпочинок', 'медитація']
-                    }
-                ]
-            }
-        };
-
-        // Функція для аналізу тексту та знаходження ключових слів
-        function analyzeText(text) {
-            text = text.toLowerCase();
-            const words = text.split(/\s+/);
-            const foundKeywords = new Set();
-            
-            // Шукаємо всі ключові слова в тексті
-            for (const category in quotesDatabase) {
-                quotesDatabase[category].keywords.forEach(keyword => {
-                    if (words.some(word => word.includes(keyword.toLowerCase()))) {
-                        foundKeywords.add(keyword);
-                    }
-                });
-            }
-            
-            return Array.from(foundKeywords);
-        }
-
-        // Функція для знаходження найбільш релевантної цитати
-        function findRelevantQuote(keywords) {
-            let bestQuote = null;
-            let maxRelevance = 0;
-
-            // Перебираємо всі категорії та їх цитати
-            for (const category in quotesDatabase) {
-                quotesDatabase[category].quotes.forEach(quote => {
-                    let relevance = 0;
-                    
-                    // Рахуємо кількість співпадінь ключових слів
-                    keywords.forEach(keyword => {
-                        if (quote.keywords.includes(keyword)) {
-                            relevance++;
-                        }
-                    });
-
-                    // Якщо знайдено більш релевантну цитату
-                    if (relevance > maxRelevance) {
-                        maxRelevance = relevance;
-                        bestQuote = quote;
-                    }
-                });
-            }
-
-            // Якщо не знайдено релевантної цитати, повертаємо випадкову
-            if (!bestQuote) {
-                const categories = Object.keys(quotesDatabase);
-                const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-                const quotes = quotesDatabase[randomCategory].quotes;
-                bestQuote = quotes[Math.floor(Math.random() * quotes.length)];
-            }
-
-            return bestQuote;
-        }
-
-        // Функція для отримання поради на основі питання
-        function getAdvice() {
+        // Функція для отримання поради на основі API
+        async function getAdvice() {
             const questionInput = document.getElementById('questionInput');
             const quoteDisplay = document.getElementById('quoteDisplay');
             const loading = document.querySelector('.loading');
@@ -322,32 +184,42 @@
             loading.classList.add('active');
             quoteDisplay.classList.remove('active');
 
-            // Імітація завантаження для кращого UX
-            setTimeout(() => {
-                const keywords = analyzeText(questionInput.value);
-                const quote = findRelevantQuote(keywords);
+            try {
+                // Запит до Quotable API
+                const response = await fetch('https://api.quotable.io/random');
+                const data = await response.json();
 
-                document.querySelector('#quoteDisplay .quote-text').textContent = `"${quote.quote}"`;
-                document.querySelector('#quoteDisplay .quote-author').textContent = `— ${quote.author}`;
+                document.querySelector('#quoteDisplay .quote-text').textContent = `"${data.content}"`;
+                document.querySelector('#quoteDisplay .quote-author').textContent = `— ${data.author}`;
 
                 loading.classList.remove('active');
                 quoteDisplay.classList.add('active');
-            }, 1500);
+            } catch (error) {
+                console.error('Помилка при отриманні цитати:', error);
+                alert('Сталася помилка при завантаженні цитати');
+                loading.classList.remove('active');
+            }
         }
 
         // Функція для отримання випадкової цитати
-        function getRandomQuote() {
-            const categories = Object.keys(quotesDatabase);
-            const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-            const quotes = quotesDatabase[randomCategory].quotes;
-            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+        async function getRandomQuote() {
+            const randomQuoteDisplay = document.getElementById('randomQuote');
 
-            document.querySelector('#randomQuote .quote-text').textContent = `"${quote.quote}"`;
-            document.querySelector('#randomQuote .quote-author').textContent = `— ${quote.author}`;
+            try {
+                // Запит до Quotable API для випадкової цитати
+                const response = await fetch('https://api.quotable.io/random');
+                const data = await response.json();
+
+                document.querySelector('#randomQuote .quote-text').textContent = `"${data.content}"`;
+                document.querySelector('#randomQuote .quote-author').textContent = `— ${data.author}`;
+            } catch (error) {
+                console.error('Помилка при отриманні випадкової цитати:', error);
+                alert('Сталася помилка при завантаженні випадкової цитати');
+            }
         }
 
-        // Завантажуємо випадкову цитату при старті
-        window.onload = getRandomQuote;
+        // Завантажуємо випадкову цитату під час першого завантаження сторінки
+        getRandomQuote();
     </script>
 </body>
 </html>
