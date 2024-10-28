@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мудрість Великих</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #00ff88;
+        }
+
+        .question-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            margin-bottom: 15px;
+            font-size: 16px;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background: #00ff88;
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #00cc6a;
+            transform: translateY(-2px);
+        }
+
+        .quote-display {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .quote-display.active {
+            display: block;
+        }
+
+        .quote-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .quote-author {
+            color: #00ff88;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .random-quote {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .dots {
+            display: inline-block;
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Мудрість Великих</h1>
+            <p>Отримайте пораду від видатних особистостей на ваше питання</p>
+        </header>
+
+        <div class="question-section">
+            <textarea id="questionInput" placeholder="Введіть ваше питання або ситуацію..."></textarea>
+            <button onclick="getAdvice()">Отримати пораду</button>
+        </div>
+
+        <div class="loading">
+            Шукаємо мудру відповідь<span class="dots"></span>
+        </div>
+
+        <div id="quoteDisplay" class="quote-display">
+            <div class="quote-text"></div>
+            <div class="quote-author"></div>
+        </div>
+
+        <div class="random-quote">
+            <h3>Випадкова мудрість дня:</h3>
+            <div id="randomQuote" class="quote-display active">
+                <div class="quote-text"></div>
+                <div class="quote-author"></div>
+            </div>
+            <button onclick="getRandomQuote()" style="margin-top: 15px;">Нова цитата</button>
+        </div>
+    </div>
+
+    <script>
+        // База даних цитат за категоріями з ключовими словами
+        const quotesDatabase = {
+            career: {
+                keywords: ['робота', 'кар\'єра', 'професія', 'бізнес', 'компанія', 'колеги', 'начальник', 'підвищення', 'зарплата', 'звільнення', 'співбесіда'],
+                quotes: [
+                    {
+                        quote: "Виберіть роботу, яку ви любите, і вам не доведеться працювати жодного дня у своєму житті",
+                        author: "Конфуцій",
+                        keywords: ['робота', 'професія', 'кар\'єра']
+                    },
+                    {
+                        quote: "Секрет успіху в бізнесі – знати те, що ніхто інший не знає",
+                        author: "Арістотель Онассіс",
+                        keywords: ['бізнес', 'успіх', 'компанія']
+                    },
+                    {
+                        quote: "Найкращі керівники – ті, хто показує шлях, а не наказує куди йти",
+                        author: "Гарольд Генін",
+                        keywords: ['начальник', 'керівництво', 'колеги']
+                    }
+                ]
+            },
+            relationships: {
+                keywords: ['кохання', 'стосунки', 'сім\'я', 'друзі', 'дружба', 'конфлікт', 'розлучення', 'шлюб', 'діти', 'батьки'],
+                quotes: [
+                    {
+                        quote: "Любов не в тому, щоб дивитися один на одного, а в тому, щоб разом дивитися в одному напрямку",
+                        author: "Антуан де Сент-Екзюпері",
+                        keywords: ['кохання', 'стосунки', 'шлюб']
+                    },
+                    {
+                        quote: "Сім'я – це не важливе, це все",
+                        author: "Майкл Дж. Фокс",
+                        keywords: ['сім\'я', 'діти', 'батьки']
+                    },
+                    {
+                        quote: "Справжня дружба – це не те, як часто ви бачитесь, а те, що ви відчуваєте, коли нарешті зустрічаєтесь",
+                        author: "Джонатан Сафран Фоєр",
+                        keywords: ['дружба', 'друзі']
+                    }
+                ]
+            },
+            personal_growth: {
+                keywords: ['розвиток', 'навчання', 'освіта', 'самовдосконалення', 'мотивація', 'цілі', 'мрії', 'страх', 'впевненість', 'зміни'],
+                quotes: [
+                    {
+                        quote: "Єдиний спосіб робити велику роботу – любити те, що ви робите",
+                        author: "Стів Джобс",
+                        keywords: ['розвиток', 'мотивація', 'цілі']
+                    },
+                    {
+                        quote: "Освіта – це не підготовка до життя; освіта – це і є життя",
+                        author: "Джон Дьюї",
+                        keywords: ['освіта', 'навчання', 'розвиток']
+                    },
+                    {
+                        quote: "Найбільший ризик – це не ризикувати",
+                        author: "Марк Цукерберг",
+                        keywords: ['страх', 'зміни', 'впевненість']
+                    }
+                ]
+            },
+            health: {
+                keywords: ['здоров\'я', 'спорт', 'стрес', 'відпочинок', 'сон', 'харчування', 'медитація', 'тренування', 'енергія', 'втома'],
+                quotes: [
+                    {
+                        quote: "Здоров'я – це не все, але все без здоров'я – ніщо",
+                        author: "Сократ",
+                        keywords: ['здоров\'я', 'життя']
+                    },
+                    {
+                        quote: "Ваше тіло може витримати майже все. Це ваш розум потрібно переконати",
+                        author: "Роджер Банністер",
+                        keywords: ['спорт', 'тренування', 'мотивація']
+                    },
+                    {
+                        quote: "Стрес – це не те, що з вами відбувається, а те, як ви на це реагуєте",
+                        author: "Ганс Сельє",
+                        keywords: ['стрес', 'відпочинок', 'медитація']
+                    }
+                ]
+            }
+        };
+
+        // Функція для аналізу тексту та знаходження ключових слів
+        function analyzeText(text) {
+            text = text.toLowerCase();
+            const words = text.split(/\s+/);
+            const foundKeywords = new Set();
+            
+            // Шукаємо всі ключові слова в тексті
+            for (const category in quotesDatabase) {
+                quotesDatabase[category].keywords.forEach(keyword => {
+                    if (words.some(word => word.includes(keyword.toLowerCase()))) {
+                        foundKeywords.add(keyword);
+                    }
+                });
+            }
+            
+            return Array.from(foundKeywords);
+        }
+
+        // Функція для знаходження найбільш релевантної цитати
+        function findRelevantQuote(keywords) {
+            let bestQuote = null;
+            let maxRelevance = 0;
+
+            // Перебираємо всі категорії та їх цитати
+            for (const category in quotesDatabase) {
+                quotesDatabase[category].quotes.forEach(quote => {
+                    let relevance = 0;
+                    
+                    // Рахуємо кількість співпадінь ключових слів
+                    keywords.forEach(keyword => {
+                        if (quote.keywords.includes(keyword)) {
+                            relevance++;
+                        }
+                    });
+
+                    // Якщо знайдено більш релевантну цитату
+                    if (relevance > maxRelevance) {
+                        maxRelevance = relevance;
+                        bestQuote = quote;
+                    }
+                });
+            }
+
+            // Якщо не знайдено релевантної цитати, повертаємо випадкову
+            if (!bestQuote) {
+                const categories = Object.keys(quotesDatabase);
+                const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+                const quotes = quotesDatabase[randomCategory].quotes;
+                bestQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            }
+
+            return bestQuote;
+        }
+
+        // Функція для отримання поради на основі питання
+        function getAdvice() {
+            const questionInput = document.getElementById('questionInput');
+            const quoteDisplay = document.getElementById('quoteDisplay');
+            const loading = document.querySelector('.loading');
+
+            if (!questionInput.value.trim()) {
+                alert('Будь ласка, введіть ваше питання');
+                return;
+            }
+
+            loading.classList.add('active');
+            quoteDisplay.classList.remove('active');
+
+            // Імітація завантаження для кращого UX
+            setTimeout(() => {
+                const keywords = analyzeText(questionInput.value);
+                const quote = findRelevantQuote(keywords);
+
+                document.querySelector('#quoteDisplay .quote-text').textContent = `"${quote.quote}"`;
+                document.querySelector('#quoteDisplay .quote-author').textContent = `— ${quote.author}`;
+
+                loading.classList.remove('active');
+                quoteDisplay.classList.add('active');
+            }, 1500);
+        }
+
+        // Функція для отримання випадкової цитати
+        function getRandomQuote() {
+            const categories = Object.keys(quotesDatabase);
+            const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+            const quotes = quotesDatabase[randomCategory].quotes;
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+
+            document.querySelector('#randomQuote .quote-text').textContent = `"${quote.quote}"`;
+            document.querySelector('#randomQuote .quote-author').textContent = `— ${quote.author}`;
+        }
+
+        // Завантажуємо випадкову цитату при старті
+        window.onload = getRandomQuote;
+    </script>
+</body>
+</html>
